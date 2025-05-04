@@ -1,38 +1,45 @@
-name: Update Hafzan Index
+name: Update Chart Automatically
 
+# This will trigger the workflow once every day at midnight UTC.
 on:
   schedule:
-    - cron: '0 0 * * *'  # Run every day at midnight
-  push:
-    branches:
-      - main  # Trigger the action when pushing to main branch
+    - cron: '0 0 * * *'  # Runs once a day at midnight UTC
+  # You can also trigger this workflow manually
+  workflow_dispatch:
 
 jobs:
-  build:
+  update_chart:
     runs-on: ubuntu-latest
-    
+
     steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v2
+      # Checkout the repository
+      - name: Checkout repository
+        uses: actions/checkout@v2
 
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: '3.8'
+      # Set up Python
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.8'  # You can change this to the desired Python version
 
-    - name: Install Dependencies
-      run: |
-        pip install -r requirements.txt
+      # Install dependencies
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
 
-    - name: Generate Chart
-      run: |
-        python generate_chart.py  # Run the script to generate index.html
+      # Run the Python script to generate chart.html
+      - name: Generate Chart
+        run: |
+          python generate_chart.py
 
-    - name: Deploy to gh-pages
-      run: |
-        git config --global user.name "your-username"
-        git config --global user.email "your-email@example.com"
-        git checkout -B gh-pages  # Switch to gh-pages branch
-        git add index.html  # Add the updated index.html file
-        git commit -m "Update Hafzan Composite Index"
-        git push -f origin gh-pages  # Force push to gh-pages
+      # Commit and push changes (chart.html)
+      - name: Commit and push changes
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          git add chart.html
+          git commit -m "Update chart.html"
+          git push origin gh-pages
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Automatically provided by GitHub Actions
