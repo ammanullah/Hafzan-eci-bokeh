@@ -1,6 +1,6 @@
 import yfinance as yf
 import pandas as pd
-import matplotlib.pyplot as plt
+from bokeh.plotting import figure, output_file, save
 
 # Your tickers and weights
 quarterly_weights = {
@@ -58,15 +58,12 @@ for i, (start, weights) in enumerate(sorted_quarters):
 # Scale the index to base value 1000
 composite = composite / composite.iloc[0] * 1000
 
-# Plot using Matplotlib (Line Chart)
-plt.figure(figsize=(12, 6))
-plt.plot(composite.index, composite, label="Hafzan Composite Index", color="blue", linewidth=1.5)
-plt.title("Hafzan Composite Index", fontsize=16)
-plt.xlabel("Date")
-plt.ylabel("Index Value")
-plt.grid(True)
-plt.legend()
-plt.tight_layout()
+# Create the Bokeh plot
+output_file("chart.html")  # Output to chart.html
 
-# Save the plot as an HTML file
-plt.savefig("index.html")
+p = figure(title="Hafzan Composite Index", x_axis_label='Date', y_axis_label='Index Value', x_axis_type="datetime")
+
+p.line(composite.index, composite.values, legend_label="Hafzan Composite Index", line_width=2)
+
+# Save the plot
+save(p)
